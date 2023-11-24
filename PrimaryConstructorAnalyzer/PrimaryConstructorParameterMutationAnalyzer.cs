@@ -79,15 +79,12 @@ public class PrimaryConstructorParameterMutationAnalyzer : DiagnosticAnalyzer
 
 	private static ExpressionSyntax? ExpressionSelector(ExpressionSyntax expression)
 	{
-		if (expression is AssignmentExpressionSyntax assignment)
-			return assignment.Left;
-
-		if (expression is PostfixUnaryExpressionSyntax postExpression)
-			return postExpression.Operand;
-
-		if (expression is PrefixUnaryExpressionSyntax preExpression)
-			return preExpression.Operand;
-
-		return null;
+		return expression switch
+		{
+			AssignmentExpressionSyntax assignment => assignment.Left,
+			PostfixUnaryExpressionSyntax postExpression => postExpression.Operand,
+			PrefixUnaryExpressionSyntax preExpression => preExpression.Operand,
+			_ => null
+		};
 	}
 }
