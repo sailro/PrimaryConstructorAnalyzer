@@ -1,0 +1,21 @@
+name: CI
+
+on:
+  push:
+    branches:
+    - main
+    - release/*
+  pull_request:
+    branches:
+    - main
+    - release/*
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v1
+    - name: Build
+      run: dotnet build -c Debug PrimaryConstructorAnalyzer.sln
+    - name: Test
+      run: dotnet test --no-build -c Debug PrimaryConstructorAnalyzer.sln
