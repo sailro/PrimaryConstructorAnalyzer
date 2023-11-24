@@ -3,7 +3,6 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Diagnostics;
 using System.Collections.Immutable;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using System.Reflection.Metadata;
 
 namespace PrimaryConstructorAnalyzer;
 
@@ -28,10 +27,10 @@ public class PrimaryConstructorParameterMutationAnalyzer : DiagnosticAnalyzer
 		context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
 		context.EnableConcurrentExecution();
 
-		context.RegisterSyntaxNodeAction(AnalyzeConstructorDeclaration, SyntaxKind.ClassDeclaration);
+		context.RegisterSyntaxNodeAction(AnalyzeClassDeclaration, SyntaxKind.ClassDeclaration);
 	}
 
-	private static void AnalyzeConstructorDeclaration(SyntaxNodeAnalysisContext context)
+	private static void AnalyzeClassDeclaration(SyntaxNodeAnalysisContext context)
 	{
 		if (context.Node is not ClassDeclarationSyntax node)
 			return;
@@ -52,16 +51,17 @@ public class PrimaryConstructorParameterMutationAnalyzer : DiagnosticAnalyzer
 
 	private static void ReportMutations(SyntaxNodeAnalysisContext context, SemanticModel model, IEnumerable<ISymbol> symbols, SyntaxNode node)
 	{
-		ReportMutations(context, model, symbols, node.DescendantNodes().OfType<AssignmentExpressionSyntax>(), node => node.Left);
-		ReportMutations(context, model, symbols, node.DescendantNodes().OfType<PostfixUnaryExpressionSyntax>(), node => node.Operand);
-		ReportMutations(context, model, symbols, node.DescendantNodes().OfType<PrefixUnaryExpressionSyntax>(), node => node.Operand);
+		ReportMutations(context, model, symbols, node.DescendantNodes().OfType<ExpressionSyntax>());
 	}
 
-	private static void ReportMutations<T>(SyntaxNodeAnalysisContext context, SemanticModel model, IEnumerable<ISymbol> symbols, IEnumerable<T> candidates, Func<T, SyntaxNode> selector) where T : ExpressionSyntax
+	private static void ReportMutations(SyntaxNodeAnalysisContext context, SemanticModel model, IEnumerable<ISymbol> symbols, IEnumerable<ExpressionSyntax> candidates)
 	{
 		foreach (var candidate in candidates)
 		{
-			var candidateNode = selector(candidate);
+			var candidateNode = ExpressionSelector(candidate);
+			if (candidateNode == null)
+				continue;
+
 			var candidateSymbol = model.GetSymbolInfo(candidateNode).Symbol;
 			if (candidateSymbol == null)
 				continue;
@@ -75,5 +75,19 @@ public class PrimaryConstructorParameterMutationAnalyzer : DiagnosticAnalyzer
 				}
 			}
 		}
+	}
+
+	private static ExpressionSyntax? ExpressionSelector(ExpressionSyntax expression)
+	{
+		if (expression is AssignmentExpressionSyntax assignment)
+			return assignment.Left;
+
+		if (expression is PostfixUnaryExpressionSyntax postExpression)
+			return postExpression.Operand;
+
+		if (expression is PrefixUnaryExpressionSyntax preExpression)
+			return preExpression.Operand;
+
+		return null;
 	}
 }
