@@ -44,17 +44,18 @@ public class PrimaryConstructorParameterMutationAnalyzer : DiagnosticAnalyzer
 			.ParameterList
 			.Parameters
 			.Select(p => model.GetDeclaredSymbol(p))
-			.OfType<IParameterSymbol>();
+			.OfType<IParameterSymbol>()
+			.ToArray();
 
 		ReportMutations(context, model, symbols, node);
 	}
 
-	private static void ReportMutations(SyntaxNodeAnalysisContext context, SemanticModel model, IEnumerable<ISymbol> symbols, SyntaxNode node)
+	private static void ReportMutations(SyntaxNodeAnalysisContext context, SemanticModel model, IParameterSymbol[] symbols, SyntaxNode node)
 	{
 		ReportMutations(context, model, symbols, node.DescendantNodes().OfType<ExpressionSyntax>());
 	}
 
-	private static void ReportMutations(SyntaxNodeAnalysisContext context, SemanticModel model, IEnumerable<ISymbol> symbols, IEnumerable<ExpressionSyntax> candidates)
+	private static void ReportMutations(SyntaxNodeAnalysisContext context, SemanticModel model, IParameterSymbol[] symbols, IEnumerable<ExpressionSyntax> candidates)
 	{
 		foreach (var candidate in candidates)
 		{
@@ -66,13 +67,9 @@ public class PrimaryConstructorParameterMutationAnalyzer : DiagnosticAnalyzer
 			if (candidateSymbol == null)
 				continue;
 
-			foreach(var symbol in symbols)
+			if (symbols.Any(symbol => SymbolEqualityComparer.Default.Equals(candidateSymbol, symbol)))
 			{
-				if (SymbolEqualityComparer.Default.Equals(candidateSymbol, symbol))
-				{
-					context.ReportDiagnostic(Diagnostic.Create(Rule, candidateNode.GetLocation(), candidateSymbol.Name));
-					break;
-				}
+				context.ReportDiagnostic(Diagnostic.Create(Rule, candidateNode.GetLocation(), candidateSymbol.Name));
 			}
 		}
 	}
