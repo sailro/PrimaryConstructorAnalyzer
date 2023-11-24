@@ -16,6 +16,6 @@ jobs:
     steps:
     - uses: actions/checkout@v1
     - name: Build
-      run: dotnet build -c Debug PrimaryConstructorAnalyzer.sln
+      run: dotnet build -c Debug PrimaryConstructorAnalyzer.Test/PrimaryConstructorAnalyzer.Test.csproj
     - name: Test
-      run: dotnet test --no-build -c Debug PrimaryConstructorAnalyzer.sln
+      run: dotnet test --no-build -c Debug PrimaryConstructorAnalyzer.Test/PrimaryConstructorAnalyzer.Test.csproj
