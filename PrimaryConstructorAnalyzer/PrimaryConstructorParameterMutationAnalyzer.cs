@@ -46,11 +46,11 @@ public class PrimaryConstructorParameterMutationAnalyzer : DiagnosticAnalyzer
 			if (symbol is null)
 				continue;
 
-			ReportMutations(context, model, node, symbol);
+			ReportMutations(context, model, symbol, node);
 		}
 	}
 
-	private static void ReportMutations(SyntaxNodeAnalysisContext context, SemanticModel model, SyntaxNode node, ISymbol symbol)
+	private static void ReportMutations(SyntaxNodeAnalysisContext context, SemanticModel model, ISymbol symbol, SyntaxNode node)
 	{
 		ReportMutations(context, model, symbol, node.DescendantNodes().OfType<AssignmentExpressionSyntax>(), node => node.Left);
 		ReportMutations(context, model, symbol, node.DescendantNodes().OfType<PostfixUnaryExpressionSyntax>(), node => node.Operand);
