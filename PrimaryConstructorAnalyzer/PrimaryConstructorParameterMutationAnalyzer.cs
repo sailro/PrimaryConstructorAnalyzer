@@ -61,13 +61,13 @@ public class PrimaryConstructorParameterMutationAnalyzer : DiagnosticAnalyzer
 	{
 		foreach (var candidate in candidates)
 		{
-			var left = selector(candidate);
-			var leftSymbol = model.GetSymbolInfo(left).Symbol;
-			if (leftSymbol == null)
+			var candidateNode = selector(candidate);
+			var candidateSymbol = model.GetSymbolInfo(candidateNode).Symbol;
+			if (candidateSymbol == null)
 				continue;
 
-			if (SymbolEqualityComparer.Default.Equals(leftSymbol, symbol))
-				context.ReportDiagnostic(Diagnostic.Create(Rule, left.GetLocation(), leftSymbol.Name));
+			if (SymbolEqualityComparer.Default.Equals(candidateSymbol, symbol))
+				context.ReportDiagnostic(Diagnostic.Create(Rule, candidateNode.GetLocation(), candidateSymbol.Name));
 		}
 	}
 }
