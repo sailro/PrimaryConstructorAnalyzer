@@ -6,3 +6,7 @@ C# 12 introduced [primary constructors](https://learn.microsoft.com/en-us/dotnet
 I'm quite sure this will come later but here is a simple analyzer to detect mutations to those parameters.
 
 Just reference the nuget in your favorite compatible IDE, and it should work.
+
+![Visual Studio](https://github.com/sailro/PrimaryConstructorAnalyzer/assets/638167/cf1fe20d-e3af-4682-baf8-e6e6a17a7c0e)
+
+![Visual Studio Code](https://github.com/sailro/PrimaryConstructorAnalyzer/assets/638167/85b2a613-2313-405b-a371-0b2c86098465)
