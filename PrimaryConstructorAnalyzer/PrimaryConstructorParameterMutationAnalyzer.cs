@@ -3,6 +3,7 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Diagnostics;
 using System.Collections.Immutable;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using System.Reflection.Metadata;
 
 namespace PrimaryConstructorAnalyzer;
 
@@ -40,24 +41,23 @@ public class PrimaryConstructorParameterMutationAnalyzer : DiagnosticAnalyzer
 
 		var model = context.SemanticModel;
 
-		foreach (var parameter in node.ParameterList.Parameters)
-		{
-			var symbol = model.GetDeclaredSymbol(parameter);
-			if (symbol is null)
-				continue;
+		var symbols = node
+			.ParameterList
+			.Parameters
+			.Select(p => model.GetDeclaredSymbol(p))
+			.OfType<IParameterSymbol>();
 
-			ReportMutations(context, model, symbol, node);
-		}
+		ReportMutations(context, model, symbols, node);
 	}
 
-	private static void ReportMutations(SyntaxNodeAnalysisContext context, SemanticModel model, ISymbol symbol, SyntaxNode node)
+	private static void ReportMutations(SyntaxNodeAnalysisContext context, SemanticModel model, IEnumerable<ISymbol> symbols, SyntaxNode node)
 	{
-		ReportMutations(context, model, symbol, node.DescendantNodes().OfType<AssignmentExpressionSyntax>(), node => node.Left);
-		ReportMutations(context, model, symbol, node.DescendantNodes().OfType<PostfixUnaryExpressionSyntax>(), node => node.Operand);
-		ReportMutations(context, model, symbol, node.DescendantNodes().OfType<PrefixUnaryExpressionSyntax>(), node => node.Operand);
+		ReportMutations(context, model, symbols, node.DescendantNodes().OfType<AssignmentExpressionSyntax>(), node => node.Left);
+		ReportMutations(context, model, symbols, node.DescendantNodes().OfType<PostfixUnaryExpressionSyntax>(), node => node.Operand);
+		ReportMutations(context, model, symbols, node.DescendantNodes().OfType<PrefixUnaryExpressionSyntax>(), node => node.Operand);
 	}
 
-	private static void ReportMutations<T>(SyntaxNodeAnalysisContext context, SemanticModel model, ISymbol symbol, IEnumerable<T> candidates, Func<T, SyntaxNode> selector) where T : ExpressionSyntax
+	private static void ReportMutations<T>(SyntaxNodeAnalysisContext context, SemanticModel model, IEnumerable<ISymbol> symbols, IEnumerable<T> candidates, Func<T, SyntaxNode> selector) where T : ExpressionSyntax
 	{
 		foreach (var candidate in candidates)
 		{
@@ -66,8 +66,14 @@ public class PrimaryConstructorParameterMutationAnalyzer : DiagnosticAnalyzer
 			if (candidateSymbol == null)
 				continue;
 
-			if (SymbolEqualityComparer.Default.Equals(candidateSymbol, symbol))
-				context.ReportDiagnostic(Diagnostic.Create(Rule, candidateNode.GetLocation(), candidateSymbol.Name));
+			foreach(var symbol in symbols)
+			{
+				if (SymbolEqualityComparer.Default.Equals(candidateSymbol, symbol))
+				{
+					context.ReportDiagnostic(Diagnostic.Create(Rule, candidateNode.GetLocation(), candidateSymbol.Name));
+					break;
+				}
+			}
 		}
 	}
 }

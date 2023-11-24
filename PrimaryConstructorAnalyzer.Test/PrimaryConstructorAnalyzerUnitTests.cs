@@ -44,16 +44,25 @@ public class PrimaryConstructorAnalyzerUnitTest
 		                    {
 		                        void Bar() {
 		                            i = 42;
+		                            bar = string.Empty;
 		                        }
 		                    }
 		                    """;
 
-		var diagnostic = VerifyCS
+		var diagnostics = new[]
+		{
+			VerifyCS
 			.Diagnostic(PrimaryConstructorParameterMutationAnalyzer.DiagnosticId)
 			.WithLocation(4, 9)
-			.WithArguments("i");
+			.WithArguments("i"),
 
-		await VerifyCS.VerifyAnalyzerAsync(test, diagnostic);
+			VerifyCS
+			.Diagnostic(PrimaryConstructorParameterMutationAnalyzer.DiagnosticId)
+			.WithLocation(5, 9)
+			.WithArguments("bar")
+		};
+
+		await VerifyCS.VerifyAnalyzerAsync(test, diagnostics);
 	}
 
 	[TestMethod]
