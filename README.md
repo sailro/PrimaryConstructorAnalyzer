@@ -8,6 +8,6 @@ I'm quite sure this will come later but here is a simple analyzer to detect muta
 
 Just reference the [nuget](https://www.nuget.org/packages/PrimaryConstructorAnalyzer) in your favorite compatible IDE, and it should work.
 
-![Visual Studio](https://github.com/sailro/PrimaryConstructorAnalyzer/assets/638167/cf1fe20d-e3af-4682-baf8-e6e6a17a7c0e)
+![Visual Studio](https://user-images.githubusercontent.com/638167/285432320-cf1fe20d-e3af-4682-baf8-e6e6a17a7c0e.png)
 
-![Visual Studio Code](https://github.com/sailro/PrimaryConstructorAnalyzer/assets/638167/85b2a613-2313-405b-a371-0b2c86098465)
+![Visual Studio Code](https://user-images.githubusercontent.com/638167/285432034-85b2a613-2313-405b-a371-0b2c86098465.png)
