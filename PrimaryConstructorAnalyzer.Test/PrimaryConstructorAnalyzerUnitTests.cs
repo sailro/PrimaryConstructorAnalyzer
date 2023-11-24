@@ -37,7 +37,7 @@ public class PrimaryConstructorAnalyzerUnitTest
 	}
 
 	[TestMethod]
-	public async Task TestPrimaryCtorParameterMutateAsync()
+	public async Task TestPrimaryCtorParameterAssignmentAsync()
 	{
 		const string test = """
 		                    class Foo(int i, string bar)
@@ -51,6 +51,66 @@ public class PrimaryConstructorAnalyzerUnitTest
 		var diagnostic = VerifyCS
 			.Diagnostic(PrimaryConstructorParameterMutationAnalyzer.DiagnosticId)
 			.WithLocation(4, 9)
+			.WithArguments("i");
+
+		await VerifyCS.VerifyAnalyzerAsync(test, diagnostic);
+	}
+
+	[TestMethod]
+	public async Task TestPrimaryCtorParameterIncrementAsync()
+	{
+		const string test = """
+		                    class Foo(int i, string bar)
+		                    {
+		                        void Bar() {
+		                            i += 1;
+		                        }
+		                    }
+		                    """;
+
+		var diagnostic = VerifyCS
+			.Diagnostic(PrimaryConstructorParameterMutationAnalyzer.DiagnosticId)
+			.WithLocation(4, 9)
+			.WithArguments("i");
+
+		await VerifyCS.VerifyAnalyzerAsync(test, diagnostic);
+	}
+
+	[TestMethod]
+	public async Task TestPrimaryCtorParameterPostUnaryIncrementAsync()
+	{
+		const string test = """
+		                    class Foo(int i, string bar)
+		                    {
+		                        void Bar() {
+		                            i++;
+		                        }
+		                    }
+		                    """;
+
+		var diagnostic = VerifyCS
+			.Diagnostic(PrimaryConstructorParameterMutationAnalyzer.DiagnosticId)
+			.WithLocation(4, 9)
+			.WithArguments("i");
+
+		await VerifyCS.VerifyAnalyzerAsync(test, diagnostic);
+	}
+
+	[TestMethod]
+	public async Task TestPrimaryCtorParameterPreUnaryDecrementAsync()
+	{
+		const string test = """
+		                    class Foo(int i, string bar)
+		                    {
+		                        void Bar() {
+		                            --i;
+		                        }
+		                    }
+		                    """;
+
+		var diagnostic = VerifyCS
+			.Diagnostic(PrimaryConstructorParameterMutationAnalyzer.DiagnosticId)
+			.WithLocation(4, 11)
 			.WithArguments("i");
 
 		await VerifyCS.VerifyAnalyzerAsync(test, diagnostic);

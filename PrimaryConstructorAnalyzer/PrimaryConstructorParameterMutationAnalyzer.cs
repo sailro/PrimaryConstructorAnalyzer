@@ -46,19 +46,22 @@ public class PrimaryConstructorParameterMutationAnalyzer : DiagnosticAnalyzer
 			if (symbol is null)
 				continue;
 
-			ReportMutations(context, node, model, symbol);
+			ReportMutations(context, model, node, symbol);
 		}
 	}
 
-	private static void ReportMutations(SyntaxNodeAnalysisContext context, SyntaxNode node, SemanticModel model, ISymbol symbol)
+	private static void ReportMutations(SyntaxNodeAnalysisContext context, SemanticModel model, SyntaxNode node, ISymbol symbol)
 	{
-		var assignments = node
-			.DescendantNodes()
-			.OfType<AssignmentExpressionSyntax>();
+		ReportMutations(context, model, symbol, node.DescendantNodes().OfType<AssignmentExpressionSyntax>(), node => node.Left);
+		ReportMutations(context, model, symbol, node.DescendantNodes().OfType<PostfixUnaryExpressionSyntax>(), node => node.Operand);
+		ReportMutations(context, model, symbol, node.DescendantNodes().OfType<PrefixUnaryExpressionSyntax>(), node => node.Operand);
+	}
 
-		foreach (var assignment in assignments)
+	private static void ReportMutations<T>(SyntaxNodeAnalysisContext context, SemanticModel model, ISymbol symbol, IEnumerable<T> candidates, Func<T, SyntaxNode> selector) where T : ExpressionSyntax
+	{
+		foreach (var candidate in candidates)
 		{
-			var left = assignment.Left;
+			var left = selector(candidate);
 			var leftSymbol = model.GetSymbolInfo(left).Symbol;
 			if (leftSymbol == null)
 				continue;
