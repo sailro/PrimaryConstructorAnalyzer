@@ -1,8 +1,8 @@
-﻿using Microsoft.CodeAnalysis;
+﻿using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Diagnostics;
+using Microsoft.CodeAnalysis;
 using System.Collections.Immutable;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace PrimaryConstructorAnalyzer;
 

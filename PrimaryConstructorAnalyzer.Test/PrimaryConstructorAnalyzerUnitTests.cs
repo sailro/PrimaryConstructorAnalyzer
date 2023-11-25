@@ -52,14 +52,14 @@ public class PrimaryConstructorAnalyzerUnitTest
 		var diagnostics = new[]
 		{
 			VerifyCS
-			.Diagnostic(PrimaryConstructorParameterMutationAnalyzer.DiagnosticId)
-			.WithLocation(4, 9)
-			.WithArguments("i"),
+				.Diagnostic(PrimaryConstructorParameterMutationAnalyzer.DiagnosticId)
+				.WithLocation(4, 9)
+				.WithArguments("i"),
 
 			VerifyCS
-			.Diagnostic(PrimaryConstructorParameterMutationAnalyzer.DiagnosticId)
-			.WithLocation(5, 9)
-			.WithArguments("bar")
+				.Diagnostic(PrimaryConstructorParameterMutationAnalyzer.DiagnosticId)
+				.WithLocation(5, 9)
+				.WithArguments("bar")
 		};
 
 		await VerifyCS.VerifyAnalyzerAsync(test, diagnostics);

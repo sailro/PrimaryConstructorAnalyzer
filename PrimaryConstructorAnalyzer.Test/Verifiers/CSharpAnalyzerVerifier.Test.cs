@@ -3,26 +3,25 @@ using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Testing.Verifiers;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace PrimaryConstructorAnalyzer.Test
+namespace PrimaryConstructorAnalyzer.Test;
+
+public static partial class CSharpAnalyzerVerifier<TAnalyzer> where TAnalyzer : DiagnosticAnalyzer, new()
 {
-	public static partial class CSharpAnalyzerVerifier<TAnalyzer> where TAnalyzer : DiagnosticAnalyzer, new()
+	public class Test : CSharpAnalyzerTest<TAnalyzer, MSTestVerifier>
 	{
-		public class Test : CSharpAnalyzerTest<TAnalyzer, MSTestVerifier>
+		public Test()
 		{
-			public Test()
+			SolutionTransforms.Add((solution, projectId) =>
 			{
-				SolutionTransforms.Add((solution, projectId) =>
-				{
-					var compilationOptions = solution.GetProject(projectId)?.CompilationOptions;
+				var compilationOptions = solution.GetProject(projectId)?.CompilationOptions;
 
-					Assert.IsNotNull(compilationOptions);
+				Assert.IsNotNull(compilationOptions);
 
-					compilationOptions = compilationOptions.WithSpecificDiagnosticOptions(compilationOptions.SpecificDiagnosticOptions.SetItems(CSharpVerifierHelper.NullableWarnings));
-					solution = solution.WithProjectCompilationOptions(projectId, compilationOptions);
+				compilationOptions = compilationOptions.WithSpecificDiagnosticOptions(compilationOptions.SpecificDiagnosticOptions.SetItems(CSharpVerifierHelper.NullableWarnings));
+				solution = solution.WithProjectCompilationOptions(projectId, compilationOptions);
 
-					return solution;
-				});
-			}
+				return solution;
+			});
 		}
 	}
 }
