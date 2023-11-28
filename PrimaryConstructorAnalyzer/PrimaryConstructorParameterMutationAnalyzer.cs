@@ -57,6 +57,8 @@ public class PrimaryConstructorParameterMutationAnalyzer : DiagnosticAnalyzer
 
 	private static void ReportMutations(SyntaxNodeAnalysisContext context, SemanticModel model, IParameterSymbol[] symbols, IEnumerable<ExpressionSyntax> candidates)
 	{
+		var comparer = SymbolEqualityComparer.Default;
+
 		foreach (var candidate in candidates)
 		{
 			var candidateNode = ExpressionSelector(candidate);
@@ -67,7 +69,7 @@ public class PrimaryConstructorParameterMutationAnalyzer : DiagnosticAnalyzer
 			if (candidateSymbol == null)
 				continue;
 
-			if (symbols.Any(symbol => SymbolEqualityComparer.Default.Equals(candidateSymbol, symbol)))
+			if (symbols.Any(symbol => comparer.Equals(candidateSymbol, symbol)))
 			{
 				context.ReportDiagnostic(Diagnostic.Create(Rule, candidateNode.GetLocation(), candidateSymbol.Name));
 			}
