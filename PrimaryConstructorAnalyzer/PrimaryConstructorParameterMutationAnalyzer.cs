@@ -61,29 +61,39 @@ public class PrimaryConstructorParameterMutationAnalyzer : DiagnosticAnalyzer
 
 		foreach (var candidate in candidates)
 		{
-			var candidateNode = ExpressionSelector(candidate);
-			if (candidateNode == null)
-				continue;
-
-			var candidateSymbol = model.GetSymbolInfo(candidateNode).Symbol;
-			if (candidateSymbol == null)
-				continue;
-
-			if (symbols.Any(symbol => comparer.Equals(candidateSymbol, symbol)))
+			foreach(var expression in ExpressionsSelector(candidate))
 			{
-				context.ReportDiagnostic(Diagnostic.Create(Rule, candidateNode.GetLocation(), candidateSymbol.Name));
+				var candidateSymbol = model.GetSymbolInfo(expression).Symbol;
+				if (candidateSymbol == null)
+					continue;
+
+				if (symbols.Any(symbol => comparer.Equals(candidateSymbol, symbol)))
+				{
+					context.ReportDiagnostic(Diagnostic.Create(Rule, expression.GetLocation(), candidateSymbol.Name));
+				}
 			}
 		}
 	}
 
-	private static ExpressionSyntax? ExpressionSelector(ExpressionSyntax expression)
+	private static IEnumerable<ExpressionSyntax> ExpressionsSelector(ExpressionSyntax expression)
 	{
 		return expression switch
 		{
-			AssignmentExpressionSyntax assignment => assignment.Left,
-			PostfixUnaryExpressionSyntax postExpression => postExpression.Operand,
-			PrefixUnaryExpressionSyntax preExpression => preExpression.Operand,
-			_ => null
+			InvocationExpressionSyntax invocation => GetArgumentsWithRefOrOutKeyword(invocation),
+			AssignmentExpressionSyntax assignment => [assignment.Left],
+			PostfixUnaryExpressionSyntax postExpression => [postExpression.Operand],
+			PrefixUnaryExpressionSyntax preExpression => [preExpression.Operand],
+			_ => []
 		};
+	}
+
+	private static IEnumerable<ExpressionSyntax> GetArgumentsWithRefOrOutKeyword(InvocationExpressionSyntax invocation)
+	{
+		foreach (var argument in invocation.ArgumentList.Arguments)
+		{
+			var keyword = argument.RefOrOutKeyword;
+			if (keyword.IsKind(SyntaxKind.RefKeyword) || keyword.IsKind(SyntaxKind.OutKeyword))
+				yield return argument.Expression;
+		}
 	}
 }
