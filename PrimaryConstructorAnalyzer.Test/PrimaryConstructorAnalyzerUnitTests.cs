@@ -124,4 +124,48 @@ public class PrimaryConstructorAnalyzerUnitTest
 
 		await VerifyCS.VerifyAnalyzerAsync(test, diagnostic);
 	}
+
+	[TestMethod]
+	public async Task TestPrimaryCtorParameterWithOutArgumentInvocationAsync()
+	{
+		const string test = """
+		                    class Foo(int c)
+		                    {
+		                        void Bar(out int x) => x = 1;
+
+		                        public void Baz() {
+		                            Bar(out c);
+		                        }
+		                    }
+		                    """;
+
+		var diagnostic = VerifyCS
+			.Diagnostic(PrimaryConstructorParameterMutationAnalyzer.DiagnosticId)
+			.WithLocation(6, 17)
+			.WithArguments("c");
+
+		await VerifyCS.VerifyAnalyzerAsync(test, diagnostic);
+	}
+
+	[TestMethod]
+	public async Task TestPrimaryCtorParameterWithRefArgumentInvocationAsync()
+	{
+		const string test = """
+		                    class Foo(int c)
+		                    {
+		                        void Bar(int y, ref int x, int z) => x = 1;
+
+		                        public void Baz() {
+		                            Bar(c, ref c, c);
+		                        }
+		                    }
+		                    """;
+
+		var diagnostic = VerifyCS
+			.Diagnostic(PrimaryConstructorParameterMutationAnalyzer.DiagnosticId)
+			.WithLocation(6, 20)
+			.WithArguments("c");
+
+		await VerifyCS.VerifyAnalyzerAsync(test, diagnostic);
+	}
 }
