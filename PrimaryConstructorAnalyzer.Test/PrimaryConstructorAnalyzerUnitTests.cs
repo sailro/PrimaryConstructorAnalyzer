@@ -7,7 +7,7 @@ namespace PrimaryConstructorAnalyzer.Test;
 public class PrimaryConstructorAnalyzerUnitTest
 {
 	[TestMethod]
-	public async Task TestRegularCtorAsync()
+	public Task TestRegularCtorAsync()
 	{
 		const string test = """
 		                    class Foo
@@ -18,11 +18,11 @@ public class PrimaryConstructorAnalyzerUnitTest
 		                    }
 		                    """;
 
-		await VerifyCS.VerifyAnalyzerAsync(test);
+		return VerifyCS.VerifyAnalyzerAsync(test);
 	}
 
 	[TestMethod]
-	public async Task TestPrimaryCtorParameterReadAsync()
+	public Task TestPrimaryCtorParameterReadAsync()
 	{
 		const string test = """
 		                    class Foo(int i)
@@ -33,11 +33,11 @@ public class PrimaryConstructorAnalyzerUnitTest
 		                    }
 		                    """;
 
-		await VerifyCS.VerifyAnalyzerAsync(test);
+		return VerifyCS.VerifyAnalyzerAsync(test);
 	}
 
 	[TestMethod]
-	public async Task TestPrimaryCtorParameterAssignmentAsync()
+	public Task TestPrimaryCtorParameterAssignmentAsync()
 	{
 		const string test = """
 		                    class Foo(int i, string bar)
@@ -62,11 +62,11 @@ public class PrimaryConstructorAnalyzerUnitTest
 				.WithArguments("bar")
 		};
 
-		await VerifyCS.VerifyAnalyzerAsync(test, diagnostics);
+		return VerifyCS.VerifyAnalyzerAsync(test, diagnostics);
 	}
 
 	[TestMethod]
-	public async Task TestPrimaryCtorParameterIncrementAsync()
+	public Task TestPrimaryCtorParameterIncrementAsync()
 	{
 		const string test = """
 		                    class Foo(int i, string bar)
@@ -82,11 +82,11 @@ public class PrimaryConstructorAnalyzerUnitTest
 			.WithLocation(4, 9)
 			.WithArguments("i");
 
-		await VerifyCS.VerifyAnalyzerAsync(test, diagnostic);
+		return VerifyCS.VerifyAnalyzerAsync(test, diagnostic);
 	}
 
 	[TestMethod]
-	public async Task TestPrimaryCtorParameterPostUnaryIncrementAsync()
+	public Task TestPrimaryCtorParameterPostUnaryIncrementAsync()
 	{
 		const string test = """
 		                    class Foo(int i, string bar)
@@ -102,11 +102,11 @@ public class PrimaryConstructorAnalyzerUnitTest
 			.WithLocation(4, 9)
 			.WithArguments("i");
 
-		await VerifyCS.VerifyAnalyzerAsync(test, diagnostic);
+		return VerifyCS.VerifyAnalyzerAsync(test, diagnostic);
 	}
 
 	[TestMethod]
-	public async Task TestPrimaryCtorParameterPreUnaryDecrementAsync()
+	public Task TestPrimaryCtorParameterPreUnaryDecrementAsync()
 	{
 		const string test = """
 		                    class Foo(int i, string bar)
@@ -122,11 +122,11 @@ public class PrimaryConstructorAnalyzerUnitTest
 			.WithLocation(4, 11)
 			.WithArguments("i");
 
-		await VerifyCS.VerifyAnalyzerAsync(test, diagnostic);
+		return VerifyCS.VerifyAnalyzerAsync(test, diagnostic);
 	}
 
 	[TestMethod]
-	public async Task TestPrimaryCtorParameterWithOutArgumentInvocationAsync()
+	public Task TestPrimaryCtorParameterWithOutArgumentInvocationAsync()
 	{
 		const string test = """
 		                    class Foo(int c)
@@ -144,11 +144,11 @@ public class PrimaryConstructorAnalyzerUnitTest
 			.WithLocation(6, 17)
 			.WithArguments("c");
 
-		await VerifyCS.VerifyAnalyzerAsync(test, diagnostic);
+		return VerifyCS.VerifyAnalyzerAsync(test, diagnostic);
 	}
 
 	[TestMethod]
-	public async Task TestPrimaryCtorParameterWithRefArgumentInvocationAsync()
+	public Task TestPrimaryCtorParameterWithRefArgumentInvocationAsync()
 	{
 		const string test = """
 		                    class Foo(int c)
@@ -166,6 +166,6 @@ public class PrimaryConstructorAnalyzerUnitTest
 			.WithLocation(6, 20)
 			.WithArguments("c");
 
-		await VerifyCS.VerifyAnalyzerAsync(test, diagnostic);
+		return VerifyCS.VerifyAnalyzerAsync(test, diagnostic);
 	}
 }
