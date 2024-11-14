@@ -1,5 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using VerifyCS = PrimaryConstructorAnalyzer.Test.CSharpAnalyzerVerifier<PrimaryConstructorAnalyzer.PrimaryConstructorParameterMutationAnalyzer>;
+using VerifyCS = PrimaryConstructorAnalyzer.Test.Verifiers.CSharpAnalyzerVerifier<PrimaryConstructorAnalyzer.PrimaryConstructorParameterMutationAnalyzer>;
 
 namespace PrimaryConstructorAnalyzer.Test;
 
